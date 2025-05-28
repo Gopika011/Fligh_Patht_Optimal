@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="flight-search-container">
+            <div class="logo">
+                <img src="{{url_for('static', filename='icon.png')}}" alt="App Logo">
+                TEAMNAME
+            </div>
+            <h2>FIND FLIGHT ROUTE</h2>
+            
+            <div class="flight-section">
+                <span class="label">FROM</span>
+                <span class="label selected-airport">KOCHI (COK)</span>
+                <div class="airport-selector">
+                    <select id="from">
+                        <option value="COK" selected> KOCHI (COK)</option>
+                        <option value="DEL">DELHI (DEL)</option>
+                    </select>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+            <div class="flight-section" id="to-container">
+                <span class="label">TO</span>
+                <span class="label selected-airport">DELHI  (DEL)</span>
+                <div class="airport-selector">
+                    <select id="to">
+                        <option value="DEL" selected>DELHI  (DEL)</option>
+                        <option value="COK">KOCHI   (COK)</option>
+                    </select>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+            
+            <div class="flight-section">
+                <span class="label">TRAVEL DATE</span>
+                <div class="current-value" id="current-date"></div>
+                <div class="date-selector">
+                    <input type="date" id="date">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+            
+            <div class="flight-section">
+                <span class="label">DEPARTURE TIME</span>
+                <div class="current-value" id="current-time"></div>
+                <div class="time-selector">
+                    <input type="time" id="time">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+            
+            <button class="search-flight" id="search-button" onclick="searchPath()">Search Flight</button>
+        </div>
+        
+        <div class="maps" id="map"></div>
+        
+        <div id="loading-state">
+            <div id="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Login</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='login.css')}} ">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>LOGIN</h2>
+            <input type="text" placeholder="Username" >
+            <input type="password" placeholder="Password">
+            <button onclick="submit()">SUBMIT</button>
+        </div>
+        <div class="image-box">
+            <img src="{{ url_for('static', filename='airplane.png') }}" alt="Flight Image">
+            
+
+        </div>
+    </div>
+</body>
+</html>

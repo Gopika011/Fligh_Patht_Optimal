@@ -590,7 +590,7 @@ class RouteFinder:
 
 
 def find_optimal_route():
-    key = '6bc045cf8fee4d6abdc75759250403'
+    key = '2bef340e981d437ebc663826251305'
     current_dir = os.path.dirname(os.path.abspath(__file__))
     flights_dir = os.path.join(current_dir, "flights")
 
