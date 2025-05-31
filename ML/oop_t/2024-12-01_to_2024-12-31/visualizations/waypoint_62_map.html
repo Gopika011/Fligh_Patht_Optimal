@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_00f88415b31c3cf0aba8ab529002147f {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_00f88415b31c3cf0aba8ab529002147f" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_00f88415b31c3cf0aba8ab529002147f = L.map(
+                "map_00f88415b31c3cf0aba8ab529002147f",
+                {
+                    center: [22.652572971168222, 77.5497231573787],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_9cb06a7bc0781218b31a4fdf072f11c4 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_9cb06a7bc0781218b31a4fdf072f11c4.addTo(map_00f88415b31c3cf0aba8ab529002147f);
+        
+    
+            var circle_623fd4b2463d3e943378429319fcb696 = L.circle(
+                [22.652572971168222, 77.5497231573787],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1000, "stroke": true, "weight": 3}
+            ).addTo(map_00f88415b31c3cf0aba8ab529002147f);
+        
+    
+        var popup_3b153c8c3ca9911a452dcbcb50395a44 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cad6dac51d751e61880eebf1c3fcd809 = $(`<div id="html_cad6dac51d751e61880eebf1c3fcd809" style="width: 100.0%; height: 100.0%;">Current Weather</div>`)[0];
+                popup_3b153c8c3ca9911a452dcbcb50395a44.setContent(html_cad6dac51d751e61880eebf1c3fcd809);
+            
+        
+
+        circle_623fd4b2463d3e943378429319fcb696.bindPopup(popup_3b153c8c3ca9911a452dcbcb50395a44)
+        ;
+
+        
+    
+    
+            var marker_db11aea35e0f352bf48d4dc4ad439fb3 = L.marker(
+                [22.583626504785705, 77.55153946681057],
+                {
+}
+            ).addTo(map_00f88415b31c3cf0aba8ab529002147f);
+        
+    
+            var icon_fedae5eb4507fea0b39c43c9cf3e0486 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "cloud",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_9fc5563ea7adf4a165f515a1226c91be = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9ba231b5b8862469369b513364b05430 = $(`<div id="html_9ba231b5b8862469369b513364b05430" style="width: 100.0%; height: 100.0%;">Matched Training Point</div>`)[0];
+                popup_9fc5563ea7adf4a165f515a1226c91be.setContent(html_9ba231b5b8862469369b513364b05430);
+            
+        
+
+        marker_db11aea35e0f352bf48d4dc4ad439fb3.bindPopup(popup_9fc5563ea7adf4a165f515a1226c91be)
+        ;
+
+        
+    
+    
+                marker_db11aea35e0f352bf48d4dc4ad439fb3.setIcon(icon_fedae5eb4507fea0b39c43c9cf3e0486);
+            
+</script>
+</html>

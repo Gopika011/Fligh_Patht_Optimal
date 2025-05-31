@@ -120,10 +120,14 @@ function displayPath(data){
 async function searchPath(){
     const searchButton = document.getElementById('search-button');
     const loadingState = document.getElementById('loading-state');
+
+    const startDate = "2024-12-01"  
+    const endDate = "2024-12-31"
+
     try{
         searchButton.disabled = true;
         loadingState.style.display = 'block';
-        const response = await fetch('/get-flight-path');
+        const response = await fetch(`/get-flight-path?start_date=${startDate}&end_date=${endDate}`);
         const data = await response.json();
         console.log(data)
 

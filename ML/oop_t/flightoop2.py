@@ -20,6 +20,9 @@ from joblib import dump, load
 from collections import Counter
 import requests
 import json
+from datetime import datetime
+
+
 class FlightWeatherProcessor:
     def __init__(self, input_dir, output_dir, api_instance,key):
         self.input_dir = input_dir
@@ -203,6 +206,35 @@ class FlightWeatherProcessor:
 
         print("🚨 Max retries reached for bulk request. Skipping...")
         return None
+    
+
+    def filtered_files(self, start_datetime, end_datetime, output_filtered_dir, skip_existing=False):
+        #filter and save
+        os.makedirs(output_filtered_dir, exist_ok=True)
+        files = glob.glob(os.path.join(self.output_dir, "*.csv")) # self.output_dir is where original processed weather files are
+
+        for file in files:
+            file_name = os.path.basename(file)
+            output_path = os.path.join(output_filtered_dir, file_name)
+
+            if skip_existing and os.path.exists(output_path):
+                print(f"Skipping already filtered file: {file_name}")
+                continue
+
+            try:
+                df = pd.read_csv(file)
+
+                first_ts = pd.to_datetime(df['timestamp'].iloc[0], unit='s')
+                if start_datetime <= first_ts <= end_datetime:
+                    filtered_df = df  
+                    filtered_df.to_csv(output_path, index=False)
+                    print(f"Filtered and saved: {file_name} to {output_path}")
+                else:
+                    print(f"No data within range for {file_name}, skipping.")
+
+            except Exception as e:
+                print(f"Error filtering file {file_name}: {e}")
+
 
 
 
@@ -583,28 +615,45 @@ class RouteFinder:
 
 
 
+def find_optimal_route(start_date_str, end_date_str):
+    # filtering out range
+    # start_date_str = "2024-12-01"  
+    # end_date_str = "2024-12-31"
+    start_datetime = datetime.strptime(start_date_str, "%Y-%m-%d")
+    end_datetime = datetime.strptime(end_date_str, "%Y-%m-%d")
 
 
-
-
-
-
-def find_optimal_route():
-    key = '2bef340e981d437ebc663826251305'
+    key = 'e7d3cf0b797548b49ab92954253105'
     current_dir = os.path.dirname(os.path.abspath(__file__))
     flights_dir = os.path.join(current_dir, "flights")
 
     # Print the resolved path
     print("Current Directory:", current_dir)
     print("Flights Directory:", flights_dir)
-    route_processor = FlightRouteProcessor(flights_dir,skip=True)
-    #
-    route_processor.load_and_process_routes()
-    #
-    route_processor.compute_average_route()
-    #
-    route_processor.save_average_route('average_route_t.csv')
 
+    # range paths
+    date_range_id = f"{start_date_str}_to_{end_date_str}"
+    date_range_base_dir = os.path.join(current_dir, date_range_id)
+
+    output_dir_weather_filtered = os.path.join(date_range_base_dir, "processed_flights_weather")
+    output_dir_cluster_data = os.path.join(date_range_base_dir, "output")
+    scalers_dir_date = os.path.join(date_range_base_dir, "scalers")
+    pca_dir_date = os.path.join(date_range_base_dir, "pca")
+    models_dir_date = os.path.join(date_range_base_dir, "models")
+    visualizations_dir_date = os.path.join(date_range_base_dir, "visualizations")
+
+    os.makedirs(output_dir_weather_filtered, exist_ok=True)
+    os.makedirs(output_dir_cluster_data, exist_ok=True)
+    os.makedirs(scalers_dir_date, exist_ok=True)
+    os.makedirs(pca_dir_date, exist_ok=True)
+    os.makedirs(models_dir_date, exist_ok=True)
+    os.makedirs(visualizations_dir_date, exist_ok=True)
+
+
+    route_processor = FlightRouteProcessor(flights_dir,skip=True)
+    route_processor.load_and_process_routes()
+    route_processor.compute_average_route()
+    route_processor.save_average_route('average_route_t.csv')
     avg_route_path = os.path.join(current_dir, "average_route_t.csv")
     output_dir = os.path.join(current_dir, "flights_processed")
 
@@ -614,39 +663,39 @@ def find_optimal_route():
 
     configuration = weatherapi.Configuration()
     configuration.api_key['key'] = key
-
-
-    # create an instance of the API class
-    api_instance = weatherapi.APIsApi(weatherapi.ApiClient(configuration))
-
+    api_instance = weatherapi.APIsApi(weatherapi.ApiClient(configuration)) # create an instance of the API class
 
     input_dir = os.path.join(current_dir, "flights_processed")
     output_dir = os.path.join(current_dir, "processed_flights_weather_t")
     weather_processor = FlightWeatherProcessor(input_dir, output_dir, api_instance,key)
     weather_processor.process_all_files(skip_existing=True)
+    weather_processor.filtered_files(start_datetime, end_datetime, output_dir_weather_filtered, skip_existing=True)
+
+
     weather_processor.get_current_weather(input=avg_route_path)
     print(weather_processor.current_data)
-    input_dir = os.path.join(current_dir, "processed_flights_weather_t")
-    output_dir = os.path.join(current_dir, "output", "test")
-    scalers_dir = os.path.join(current_dir, "scalers", "test")
-    pca_dir = os.path.join(current_dir, "pca", "test")
-    models_dir = os.path.join(current_dir, "models", "test")
-    visualizations_dir = os.path.join(current_dir, "visualizations")
+    
 
-    cluster_processor = FlightClusterProcessor(input_dir, output_dir, scalers_dir, pca_dir, models_dir, visualizations_dir)
+    # input_dir = os.path.join(current_dir, "processed_flights_weather_t")
+    # output_dir = os.path.join(current_dir, "output", "test")
+    # scalers_dir = os.path.join(current_dir, "scalers", "test")
+    # pca_dir = os.path.join(current_dir, "pca", "test")
+    # models_dir = os.path.join(current_dir, "models", "test")
+    # visualizations_dir = os.path.join(current_dir, "visualizations")
+
+    input_dir_for_clustering = output_dir_weather_filtered
+
+    cluster_processor = FlightClusterProcessor(input_dir_for_clustering, output_dir_cluster_data, scalers_dir_date, pca_dir_date, models_dir_date, visualizations_dir_date)
     cluster_processor.process_all_waypoints()
     cluster_processor.predict_and_save_visualizations(weather_processor.current_data)
+
     print("Processing completed...")
     print(len(cluster_processor.clusters))
-    waypoint_dir = os.path.join(current_dir, "output", "test")
+    waypoint_dir = output_dir_cluster_data
     route_finder=RouteFinder(cluster=cluster_processor.clusters,input_dir=waypoint_dir,routes_dir=flights_dir,limit=5)
     #this contains the filename
     shortest_route=route_finder.predict_optimal_route()
     return shortest_route
-
-
-
-
 
 
 
