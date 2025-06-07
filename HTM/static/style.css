@@ -124,7 +124,7 @@ body {
     transform: none; 
     transition: none; 
 }
-#map {
+.maps {
     width: 100%;
     height: 650px;
     border-radius: 10px;
