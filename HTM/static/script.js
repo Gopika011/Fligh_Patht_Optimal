@@ -14,19 +14,23 @@ function formatTime(date) {
 }
 
 // Set current date and time
-const dateInput = document.getElementById('date');
+const startDateInput = document.getElementById('start-date');
+const endDateInput = document.getElementById('end-date');
 const timeInput = document.getElementById('time');
-const currentDateDisplay = document.getElementById('current-date');
+const startDateDisplay = document.getElementById('current-start-date');
+const endDateDisplay = document.getElementById('current-end-date');
 const currentTimeDisplay = document.getElementById('current-time');
 
 const now = new Date();
 const formattedDate = formatDate(now);
 const formattedTime = formatTime(now);
 
-dateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
+startDateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
+endDateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
 timeInput.value = formattedTime;
 
-currentDateDisplay.textContent = `${formattedDate}`;
+startDateDisplay.textContent = `${formattedDate}`;
+endDateDisplay.textContent = `${formattedDate}`;
 currentTimeDisplay.textContent = `${formattedTime}`;
 
 // Update the displayed time every minute
@@ -37,9 +41,14 @@ setInterval(() => {
 }, 60000); // Update every minute
 
 
-dateInput.addEventListener("change", function () {
+startDateInput.addEventListener("change", function () {
     const selectedDate = new Date(this.value);
-    currentDateDisplay.textContent = formatDate(selectedDate);
+    startDateDisplay.textContent = formatDate(selectedDate);
+});
+
+endDateInput.addEventListener("change", function () {
+    const selectedDate = new Date(this.value);
+    endDateDisplay.textContent = formatDate(selectedDate);
 });
 
 
@@ -61,9 +70,15 @@ document.querySelectorAll(".flight-section select").forEach(select => {
 });
 
 
-document.querySelector(".date-selector").addEventListener("click", function () {
-    dateInput.showPicker(); // Opens date picker
+document.querySelector(".start-date-selector").addEventListener("click", function () {
+    startDateInput.showPicker(); // Opens date picker
 });
+
+document.querySelector(".end-date-selector").addEventListener("click", function () {
+    endDateInput.showPicker(); // Opens date picker
+});
+
+
 document.querySelector(".time-selector").addEventListener("click", function () {
     timeInput.showPicker(); // Opens time picker
 });
@@ -121,13 +136,18 @@ async function searchPath(){
     const searchButton = document.getElementById('search-button');
     const loadingState = document.getElementById('loading-state');
 
+    const start_date = document.getElementById('start-date').value;
+    const end_date = document.getElementById('end-date').value;
+
+    console.log(start_date, end_date);
+
     const startDate = "2024-12-01"  
     const endDate = "2024-12-31"
 
     try{
         searchButton.disabled = true;
         loadingState.style.display = 'block';
-        const response = await fetch(`/get-flight-path?start_date=${startDate}&end_date=${endDate}`);
+        const response = await fetch(`/get-flight-path?start_date=${start_date}&end_date=${end_date}`);
         const data = await response.json();
         console.log(data)
 

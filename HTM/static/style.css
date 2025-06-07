@@ -62,12 +62,13 @@ body {
 }
 
 .time-selector input,
-.date-selector input {
+.end-date-selector input,
+.start-date-selector input {
     box-sizing: border-box; /* Includes padding in width calculation */
 }
 
 
-#to,#from, #date, #time {
+#to,#from, #start-date, #end-date, #time {
     font-weight: bold; /* Make dropdown text bold */
     font-family: 'Orbitron', sans-serif;
     width: 100%;

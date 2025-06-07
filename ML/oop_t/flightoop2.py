@@ -21,6 +21,10 @@ from collections import Counter
 import requests
 import json
 from datetime import datetime
+import cProfile
+import pstats
+import io
+
 
 
 class FlightWeatherProcessor:
@@ -497,8 +501,11 @@ class FlightClusterProcessor:
             cluster = kmeans.predict(reduced_current)[0]
             self.clusters.append(cluster)
             # Save visualization as an image
-            self._save_cluster_visualization(wp_num, train_df, scaler, pca, kmeans, reduced_current, cluster)
-            self.visualize_on_map(wp_num, location_data, matched_train_point)
+
+            GENERATE_PLOTS = False
+            if GENERATE_PLOTS:
+                self._save_cluster_visualization(wp_num, train_df, scaler, pca, kmeans, reduced_current, cluster)
+                self.visualize_on_map(wp_num, location_data, matched_train_point)
 
     def match_location_with_train_data(self, train_df, current_features):
         """Match current weather data location with the closest training data point."""
@@ -699,3 +706,18 @@ def find_optimal_route(start_date_str, end_date_str):
 
 
 
+
+# profiler = cProfile.Profile()
+# profiler.enable()
+
+# shortest_route = find_optimal_route("2024-12-01","2024-12-31")
+
+# profiler.disable()
+
+
+# stats_file_path = "profile_output.txt"
+# with open(stats_file_path, "w") as f:
+#     ps = pstats.Stats(profiler, stream=f).sort_stats('cumulative') 
+#     ps.print_stats()
+
+# print(f"Profiler output saved to: {stats_file_path}")

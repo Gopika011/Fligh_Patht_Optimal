@@ -28,7 +28,7 @@
                 <div class="airport-selector">
                     <select id="from">
                         <option value="COK" selected> KOCHI (COK)</option>
-                        <option value="DEL">DELHI (DEL)</option>
+                        <!-- <option value="DEL">DELHI (DEL)</option> -->
                     </select>
                     <span class="dropdown-arrow">▼</span>
                 </div>
@@ -39,17 +39,26 @@
                 <div class="airport-selector">
                     <select id="to">
                         <option value="DEL" selected>DELHI  (DEL)</option>
-                        <option value="COK">KOCHI   (COK)</option>
+                        <!-- <option value="COK">KOCHI   (COK)</option> -->
                     </select>
                     <span class="dropdown-arrow">▼</span>
                 </div>
             </div>
             
             <div class="flight-section">
-                <span class="label">TRAVEL DATE</span>
-                <div class="current-value" id="current-date"></div>
-                <div class="date-selector">
-                    <input type="date" id="date">
+                <span class="label">START DATE</span>
+                <div class="current-value" id="current-start-date"></div>
+                <div class="start-date-selector">
+                    <input type="date" id="start-date">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+
+            <div class="flight-section">
+                <span class="label">END DATE</span>
+                <div class="current-value" id="current-end-date"></div>
+                <div class="end-date-selector">
+                    <input type="date" id="end-date">
                     <span class="dropdown-arrow">▼</span>
                 </div>
             </div>
