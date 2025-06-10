@@ -83,13 +83,25 @@ document.querySelector(".time-selector").addEventListener("click", function () {
     timeInput.showPicker(); // Opens time picker
 });
 
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxZmM2YmIxMi1hZTMyLTRkNjQtODI0NC02ODQ2ZDZiM2JkM2QiLCJpZCI6MzEwMDg2LCJpYXQiOjE3NDkyOTc1NTh9.503N3_rd0bfAL-JOVdqm31i-E-pyRwU9FVylJHXCGq8';
+
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+    });
+
+    // Fly the camera to San Francisco at the given longitude, latitude, and height.
+   viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+      orientation: {
+        heading: Cesium.Math.toRadians(0.0),
+        pitch: Cesium.Math.toRadians(-15.0),
+      }
+    });
 
 
 // map
-var map = L.map('map').setView([20.5937, 78.9629], 4);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+
 
 
 
@@ -97,38 +109,66 @@ function displayPath(data){
     console.log(data);
     let route_data = data.route_data
     let optimal = data.optimal_path
-    
-    const routePoints = route_data.map(point => {
-        const [lat, lon] = point.Position.split(',').map(coord => parseFloat(coord.trim()));
-        return [lat, lon];
-    });
-    const pathLine = L.polyline(routePoints, {color: '#0e52fe'}).addTo(map);
-    map.flyToBounds(pathLine.getBounds(), { duration: 0.4 }); 
-    // map.fitBounds(pathLine.getBounds());
 
-    // Add markers for each waypoint
-    // data.forEach(point => {
-    //     L.marker([parseFloat(point.lat), parseFloat(point.lon)])
-    //         .bindPopup(`Waypoint ID: ${point.waypoint_ID}<br>Altitude: ${point.altitude}`)
-    //         .addTo(map);
-    // });
+    const routePoints = [];
 
-    // Add marker to start and stop
-    
-    L.marker(routePoints[0])
-    .bindPopup("Source")
-    .addTo(map);
+    route_data.forEach(point => {
+    const [lat, lon] = point.Position.split(',').map(coord => parseFloat(coord.trim()));
+    const alt = parseFloat(point.Altitude);
 
-    L.marker(routePoints[routePoints.length - 1])
-    .bindPopup("Destination")
-    .addTo(map)
+    // or point.alt, based on your data structure
+    routePoints.push(lon, lat, alt);
+});
+    console.log(routePoints)
+    const polylines = new Cesium.PolylineCollection();
+    polylines.add({
+  positions : Cesium.Cartesian3.fromDegreesArrayHeights(routePoints),
+  width : 5
+});
 
-    const routePointsOP = optimal.map(point =>{
-        return [parseFloat(point.latitude), parseFloat(point.longitude)];
+    const average_points=[];
+    const maxAltitude= 40000;
+    const n = optimal.length;
+   optimal.forEach((point, i) => {
+    const lat = parseFloat(point.latitude);
+    const lon = parseFloat(point.longitude);
+
+    // Normalized time (0 to 1)
+    const t = i / (n - 1);
+
+    // Parabolic altitude: peaks at the middle
+    const alt = maxAltitude * (4 * t * (1 - t));
+
+    average_points.push(lon, lat, alt); // Cesium uses lon, lat, alt
+});
+    console.log(average_points)
+
+
+  viewer.entities.add({
+  polyline: {
+    positions: Cesium.Cartesian3.fromDegreesArrayHeights(routePoints),
+    width: 10,
+    material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.GREEN),
+    clampToGround: false // Optional: remove if you're clamping to terrain
+  }
+});
+    viewer.entities.add({
+  polyline: {
+    positions: Cesium.Cartesian3.fromDegreesArrayHeights(average_points),
+    width: 5,
+    material: new Cesium.PolylineDashMaterialProperty({
+      color: Cesium.Color.BLUE.withAlpha(0.6),
+      dashLength: 16
     })
-
-    const pathLineOP = L.polyline(routePointsOP, {color:'#808080', dashArray: '5, 10'}).addTo(map);
-    map.flyToBounds(pathLineOP.getBounds(), { duration: 0.4 }); 
+  }
+});
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(routePoints[0],routePoints[1],40000),
+      orientation: {
+        heading: Cesium.Math.toRadians(0.0),
+        pitch: Cesium.Math.toRadians(-15.0),
+      }
+    });
 
 }
 
