@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.130/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.130/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
@@ -50,7 +52,7 @@
                 <span class="label">START DATE</span>
                 <div class="current-value" id="current-start-date"></div>
                 <div class="start-date-selector">
-                    <input type="date" id="start-date">
+                    <input type="date" id="start-date" min="2024-12-01" max="2025-02-28">
                     <span class="dropdown-arrow">▼</span>
                 </div>
             </div>
@@ -59,12 +61,12 @@
                 <span class="label">END DATE</span>
                 <div class="current-value" id="current-end-date"></div>
                 <div class="end-date-selector">
-                    <input type="date" id="end-date">
+                    <input id="end-date" placeholder="Select end date">
                     <span class="dropdown-arrow">▼</span>
                 </div>
             </div>
             
-            <div class="flight-section">
+            <div class="flight-section" style="visibility: hidden;">
                 <span class="label">DEPARTURE TIME</span>
                 <div class="current-value" id="current-time"></div>
                 <div class="time-selector">
