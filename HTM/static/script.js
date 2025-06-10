@@ -1,3 +1,16 @@
+  flatpickr("#start-date", {
+    dateFormat: "Y-m-d",
+    minDate: "2024-12-01",
+    maxDate: "2025-02-28"
+  });
+
+  flatpickr("#end-date", {
+    dateFormat: "Y-m-d",
+    minDate: "2024-12-01",
+    maxDate: "2025-02-28"
+  });
+
+
 // Function to format date as DD/MM/YYYY
 function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
@@ -29,6 +42,8 @@ startDateInput.value = now.toISOString().split('T')[0]; // Set input value in YY
 endDateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
 timeInput.value = formattedTime;
 
+
+// show current date on inputs
 startDateDisplay.textContent = `${formattedDate}`;
 endDateDisplay.textContent = `${formattedDate}`;
 currentTimeDisplay.textContent = `${formattedTime}`;
