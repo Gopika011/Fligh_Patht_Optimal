@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.130/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.130/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
@@ -76,8 +77,9 @@
             
             <button class="search-flight" id="search-button" onclick="searchPath()">Search Flight</button>
         </div>
-        
-        <div class="maps" id="map"></div>
+        <div id="cesiumContainer" class="maps"></div>
+
+ </div>
         
         <div id="loading-state">
             <div id="loading-spinner">
