@@ -212,13 +212,18 @@ class FlightWeatherProcessor:
         return None
     
 
-    def filtered_files(self, start_datetime, end_datetime, output_filtered_dir, skip_existing=False):
+    def filtered_files(self, start_datetime, end_datetime, output_filtered_dir, flight_number=None, skip_existing=False):
         #filter and save
         os.makedirs(output_filtered_dir, exist_ok=True)
         files = glob.glob(os.path.join(self.output_dir, "*.csv")) # self.output_dir is where original processed weather files are
 
         for file in files:
             file_name = os.path.basename(file)
+
+            if flight_number and flight_number not in file_name:
+                    print(f"Skipping {file_name}: flight {flight_number} not found in name")
+                    continue
+
             output_path = os.path.join(output_filtered_dir, file_name)
 
             if skip_existing and os.path.exists(output_path):
@@ -429,18 +434,67 @@ class FlightClusterProcessor:
 
     def find_optimal_clusters(self, X_train, max_k=11):
         """Find the optimal number of clusters using the elbow method and silhouette scores."""
+        n_samples = len(X_train)    #no of csv files
+        max_k = min(max_k, n_samples - 1)
+        
+        # If we have very few samples, return a small number of clusters
+        if n_samples < 4:
+            print(f"Too few samples ({n_samples}), using k=2")
+            return 2
+        if max_k < 2:
+            print(f"max_k too small ({max_k}), using k=2")
+            return 2
+        
         scores = []
         silhouette_scores = {}
-        for k in range(2, max_k):
-            kmeans = KMeans(n_clusters=k, random_state=42)
-            kmeans_labels = kmeans.fit_predict(X_train)
-            scores.append(kmeans.inertia_)
-            silhouette_avg = silhouette_score(X_train, kmeans_labels)
-            silhouette_scores[k] = silhouette_avg
+        valid_k_values = []
+        
+        # Test different numbers of clusters
+        for k in range(2, max_k + 1):
+            try:
+                kmeans = KMeans(n_clusters=k, random_state=42)
+                kmeans_labels = kmeans.fit_predict(X_train)
+                scores.append(kmeans.inertia_)
+                silhouette_avg = silhouette_score(X_train, kmeans_labels)
+                silhouette_scores[k] = silhouette_avg
+                valid_k_values.append(k)
+            except Exception as e:
+                print(f"Error calculating clusters for k={k}: {e}")
+                continue
+        
+        # If no valid clusters were found, return 2
+        if not scores or not silhouette_scores or not valid_k_values:
+            print("No valid clusters found, using k=2")
+            return 2
 
         # Use KneeLocator to find the elbow point
-        kl = KneeLocator(range(2, max_k), scores, curve="convex", direction="decreasing")
-        return kl.elbow
+        try:
+            kl = KneeLocator(valid_k_values, scores, curve="convex", direction="decreasing")
+            optimal_k = kl.elbow
+            print(f"KneeLocator found elbow at k={optimal_k}")
+        except Exception as e:
+            print(f"KneeLocator error: {e}")
+            optimal_k = None
+        
+        # If KneeLocator fails to find an elbow, fall back to the k with best silhouette score
+        if optimal_k is None or optimal_k not in valid_k_values:
+            if silhouette_scores:
+                best_k = max(silhouette_scores.keys(), key=lambda k: silhouette_scores[k])
+                print(f"KneeLocator failed, using k={best_k} based on silhouette score")
+                return int(best_k)
+            else:
+                # Ultimate fallback - use 2 clusters
+                print("Both KneeLocator and silhouette score failed, using k=2")
+                return 2
+        
+        # Validate that optimal_k is a valid integer
+        if optimal_k is None or not isinstance(optimal_k, (int, np.integer)) or optimal_k < 2:
+            print(f"Invalid optimal_k value: {optimal_k}, using k=2")
+            return 2
+        
+        final_k = int(optimal_k)
+        print(f"Final k value: {final_k}")
+        return final_k
 
     def form_clusters(self, wp, data):
         """Perform clustering for a specific waypoint."""
@@ -459,7 +513,12 @@ class FlightClusterProcessor:
         dump(pca, f'{self.pca_dir}/pca_{wp}.joblib')
 
         # Find the optimal number of clusters
-        n_clusters = self.find_optimal_clusters(reduced_data)
+        try:
+            n_clusters = self.find_optimal_clusters(reduced_data)
+            print(f"Waypoint {wp}: Using {n_clusters} clusters for {len(n_data)} samples")
+        except Exception as e:
+            print(f"Waypoint {wp}: Error finding optimal clusters: {e}. Using 2 clusters.")
+            n_clusters = 2
 
         # Perform KMeans clustering
         kmeans = KMeans(n_clusters=n_clusters, random_state=42)
@@ -622,7 +681,7 @@ class RouteFinder:
 
 
 
-def find_optimal_route(start_date_str, end_date_str):
+def find_optimal_route(start_date_str, end_date_str, flight_number=None):
     # filtering out range
     # start_date_str = "2024-12-01"  
     # end_date_str = "2024-12-31"
@@ -630,7 +689,7 @@ def find_optimal_route(start_date_str, end_date_str):
     end_datetime = datetime.strptime(end_date_str, "%Y-%m-%d")
 
 
-    key = 'e7d3cf0b797548b49ab92954253105'
+    key = 'c813413bbf4a41559ce50535251908'
     current_dir = os.path.dirname(os.path.abspath(__file__))
     flights_dir = os.path.join(current_dir, "flights")
 
@@ -638,9 +697,13 @@ def find_optimal_route(start_date_str, end_date_str):
     print("Current Directory:", current_dir)
     print("Flights Directory:", flights_dir)
 
+    filtered_base_dir = os.path.join(current_dir, "filtered")
+    os.makedirs(filtered_base_dir, exist_ok=True)
+
     # range paths
-    date_range_id = f"{start_date_str}_to_{end_date_str}"
-    date_range_base_dir = os.path.join(current_dir, date_range_id)
+    safe_flight_number = flight_number if flight_number is not None else "N_A"
+    date_range_id = f"flight_{safe_flight_number}_{start_date_str}_to_{end_date_str}"
+    date_range_base_dir = os.path.join(filtered_base_dir, date_range_id)
 
     output_dir_weather_filtered = os.path.join(date_range_base_dir, "processed_flights_weather")
     output_dir_cluster_data = os.path.join(date_range_base_dir, "output")
@@ -656,18 +719,20 @@ def find_optimal_route(start_date_str, end_date_str):
     os.makedirs(models_dir_date, exist_ok=True)
     os.makedirs(visualizations_dir_date, exist_ok=True)
 
-
-    route_processor = FlightRouteProcessor(flights_dir,skip=True)
+    #----STEP1----
+    route_processor = FlightRouteProcessor(flights_dir,skip=True) 
     route_processor.load_and_process_routes()
     route_processor.compute_average_route()
     route_processor.save_average_route('average_route_t.csv')
     avg_route_path = os.path.join(current_dir, "average_route_t.csv")
-    output_dir = os.path.join(current_dir, "flights_processed")
 
+
+    #----STEP2----
+    output_dir = os.path.join(current_dir, "flights_processed")
     data_processor = FlightDataProcessor(flights_dir, avg_route_path, output_dir)
     data_processor.process_all_flights(skip_existing=True)
 
-
+    #----STEP3----
     configuration = weatherapi.Configuration()
     configuration.api_key['key'] = key
     api_instance = weatherapi.APIsApi(weatherapi.ApiClient(configuration)) # create an instance of the API class
@@ -676,8 +741,8 @@ def find_optimal_route(start_date_str, end_date_str):
     output_dir = os.path.join(current_dir, "processed_flights_weather_t")
     weather_processor = FlightWeatherProcessor(input_dir, output_dir, api_instance,key)
     weather_processor.process_all_files(skip_existing=True)
-    weather_processor.filtered_files(start_datetime, end_datetime, output_dir_weather_filtered, skip_existing=True)
 
+    weather_processor.filtered_files(start_datetime, end_datetime, output_dir_weather_filtered, flight_number=flight_number, skip_existing=True)
 
     weather_processor.get_current_weather(input=avg_route_path)
     print(weather_processor.current_data)
