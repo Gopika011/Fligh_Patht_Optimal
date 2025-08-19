@@ -27,7 +27,7 @@
             
             <div class="flight-section">
                 <span class="label">FROM</span>
-                <span class="label selected-airport">KOCHI (COK)</span>
+                <span class="label selected-airport" id="selected-from-airport">KOCHI (COK)</span>
                 <div class="airport-selector">
                     <select id="from">
                         <option value="COK" selected> KOCHI (COK)</option>
@@ -38,7 +38,7 @@
             </div>
             <div class="flight-section" id="to-container">
                 <span class="label">TO</span>
-                <span class="label selected-airport">DELHI  (DEL)</span>
+                <span class="label selected-airport" id="selected-to-airport">DELHI  (DEL)</span>
                 <div class="airport-selector">
                     <select id="to">
                         <option value="DEL" selected>DELHI  (DEL)</option>
@@ -66,11 +66,22 @@
                 </div>
             </div>
             
-            <div class="flight-section" style="visibility: hidden;">
+            <!-- <div class="flight-section" style="visibility: hidden;">
                 <span class="label">DEPARTURE TIME</span>
                 <div class="current-value" id="current-time"></div>
                 <div class="time-selector">
                     <input type="time" id="time">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div> -->
+            <div class="flight-section">
+                <span class="label">FLIGHT NUMBER</span>
+                <span class="label selected-airport" id="selected-flight-number">AI2886</span>
+                <div class="flight-number-selector">
+                    <select id="flight-number-select">
+                        <option value="AI2886" selected>AI2886(nov,dec)</option>
+                        <option value="AI504">AI504(feb)</option>
+                    </select>
                     <span class="dropdown-arrow">▼</span>
                 </div>
             </div>

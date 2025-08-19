@@ -1,14 +1,25 @@
-  flatpickr("#start-date", {
-    dateFormat: "Y-m-d",
-    minDate: "2024-12-01",
-    maxDate: "2025-02-28"
-  });
+flatpickr("#start-date", {
+  dateFormat: "Y-m-d",
+  minDate: "2024-12-01",
+  maxDate: "2025-02-28",
+  onChange: function (selectedDates) {
+    if (selectedDates.length > 0) {
+      startDateDisplay.textContent = formatDate(selectedDates[0]);
+    }
+  }
+});
 
-  flatpickr("#end-date", {
-    dateFormat: "Y-m-d",
-    minDate: "2024-12-01",
-    maxDate: "2025-02-28"
-  });
+flatpickr("#end-date", {
+  dateFormat: "Y-m-d",
+  minDate: "2024-12-01",
+  maxDate: "2025-02-28",
+  onChange: function (selectedDates) {
+    if (selectedDates.length > 0) {
+      endDateDisplay.textContent = formatDate(selectedDates[0]);
+    }
+  }
+});
+
 
 
 // Function to format date as DD/MM/YYYY
@@ -19,12 +30,12 @@ function formatDate(date) {
     return `${day}/${month}/${year}`;
 }
 
-// Function to format time as HH:MM
-function formatTime(date) {
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-}
+// // Function to format time as HH:MM
+// function formatTime(date) {
+//     const hours = String(date.getHours()).padStart(2, '0');
+//     const minutes = String(date.getMinutes()).padStart(2, '0');
+//     return `${hours}:${minutes}`;
+// }
 
 // Set current date and time
 const startDateInput = document.getElementById('start-date');
@@ -33,43 +44,36 @@ const timeInput = document.getElementById('time');
 const startDateDisplay = document.getElementById('current-start-date');
 const endDateDisplay = document.getElementById('current-end-date');
 const currentTimeDisplay = document.getElementById('current-time');
+const flightNumberSelect = document.getElementById('flight-number-select'); 
+const selectedFlightNumberDisplay = document.getElementById('selected-flight-number');
 
 const now = new Date();
 const formattedDate = formatDate(now);
-const formattedTime = formatTime(now);
+// const formattedTime = formatTime(now);
 
 startDateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
 endDateInput.value = now.toISOString().split('T')[0]; // Set input value in YYYY-MM-DD format
-timeInput.value = formattedTime;
+// timeInput.value = formattedTime;
 
 
 // show current date on inputs
 startDateDisplay.textContent = `${formattedDate}`;
 endDateDisplay.textContent = `${formattedDate}`;
-currentTimeDisplay.textContent = `${formattedTime}`;
+selectedFlightNumberDisplay.textContent = flightNumberSelect.value;
 
-// Update the displayed time every minute
-setInterval(() => {
-    const now = new Date();
-    const formattedTime = formatTime(now);
-    currentTimeDisplay.textContent = `${formattedTime}`;
-}, 60000); // Update every minute
+// currentTimeDisplay.textContent = `${formattedTime}`;
 
-
-startDateInput.addEventListener("change", function () {
-    const selectedDate = new Date(this.value);
-    startDateDisplay.textContent = formatDate(selectedDate);
-});
-
-endDateInput.addEventListener("change", function () {
-    const selectedDate = new Date(this.value);
-    endDateDisplay.textContent = formatDate(selectedDate);
-});
+// // Update the displayed time every minute
+// setInterval(() => {
+//     const now = new Date();
+//     const formattedTime = formatTime(now);
+//     currentTimeDisplay.textContent = `${formattedTime}`;
+// }, 60000); // Update every minute
 
 
-timeInput.addEventListener("change", function () {
-    currentTimeDisplay.textContent = this.value;
-});
+// timeInput.addEventListener("change", function () {
+//     currentTimeDisplay.textContent = this.value;
+// });
 
 
 // inputs
@@ -79,7 +83,14 @@ document.querySelectorAll(".flight-section select").forEach(select => {
         this.closest(".flight-section").blur(); // Remove focus from the container
         
         let selectedText = this.options[this.selectedIndex].text;
-        this.closest(".flight-section").querySelector(".selected-airport").textContent = selectedText;
+        // Update the specific display span based on the select's ID
+        if (this.id === 'from') {
+            document.getElementById('selected-from-airport').textContent = selectedText;
+        } else if (this.id === 'to') {
+            document.getElementById('selected-to-airport').textContent = selectedText;
+        } else if (this.id === 'flight-number-select') {
+            document.getElementById('selected-flight-number').textContent = selectedText;
+        }
 
     });
 });
@@ -94,9 +105,9 @@ document.querySelector(".end-date-selector").addEventListener("click", function 
 });
 
 
-document.querySelector(".time-selector").addEventListener("click", function () {
-    timeInput.showPicker(); // Opens time picker
-});
+// document.querySelector(".time-selector").addEventListener("click", function () {
+//     timeInput.showPicker(); // Opens time picker
+// });
 
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxZmM2YmIxMi1hZTMyLTRkNjQtODI0NC02ODQ2ZDZiM2JkM2QiLCJpZCI6MzEwMDg2LCJpYXQiOjE3NDkyOTc1NTh9.503N3_rd0bfAL-JOVdqm31i-E-pyRwU9FVylJHXCGq8';
 
@@ -193,8 +204,9 @@ async function searchPath(){
 
     const start_date = document.getElementById('start-date').value;
     const end_date = document.getElementById('end-date').value;
+    const flight_number = document.getElementById('flight-number-select').value;
 
-    console.log(start_date, end_date);
+    console.log("Searching for:", { start_date, end_date, flight_number });
 
     const startDate = "2024-12-01"  
     const endDate = "2024-12-31"
@@ -202,7 +214,7 @@ async function searchPath(){
     try{
         searchButton.disabled = true;
         loadingState.style.display = 'block';
-        const response = await fetch(`/get-flight-path?start_date=${start_date}&end_date=${end_date}`);
+        const response = await fetch(`/get-flight-path?start_date=${start_date}&end_date=${end_date}&flight_number=${flight_number}`);
         const data = await response.json();
         console.log(data)
 

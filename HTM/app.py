@@ -36,8 +36,9 @@ def get():
     try:
         start_date_str = request.args.get('start_date')
         end_date_str = request.args.get('end_date')
+        flight_no_str = request.args.get('flight_number')
         
-        shortest_route = find_optimal_route(start_date_str, end_date_str)
+        shortest_route = find_optimal_route(start_date_str, end_date_str, flight_no_str)
         if not shortest_route or "No optimal route found" in shortest_route:
             return jsonify({"error": "No optimal route found"}), 404 
         

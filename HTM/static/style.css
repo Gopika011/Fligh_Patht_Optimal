@@ -63,12 +63,13 @@ body {
 
 .time-selector input,
 .end-date-selector input,
-.start-date-selector input {
+.start-date-selector input,
+.flight-number-selector select{
     box-sizing: border-box; /* Includes padding in width calculation */
 }
 
 
-#to,#from, #start-date, #end-date, #time {
+#to,#from, #start-date, #end-date, #time, #flight-number-select{
     font-weight: bold; /* Make dropdown text bold */
     font-family: 'Orbitron', sans-serif;
     width: 100%;
@@ -90,18 +91,22 @@ body {
 .flight-section:hover #to,
 .flight-section:hover #from,
 .flight-section:hover #date,
+.flight-section:hover #flight-number-select,
 .flight-section:hover #time,
 .flight-section:focus-within #to,
 .flight-section:focus-within #from,
 .flight-section:focus-within #date,
-.flight-section:focus-within #time {
+.flight-section:focus-within #time,
+.flight-section:focus-within #flight-number-select {
     opacity: 1;
 }
 
 /* .airport-selector, .date-selector, .time-selector {
     pointer-events: none;
 } */
-
+#selected-flight-number{
+    color: #525252;
+}
 .search-flight {
     width: 100%;
     padding: 10px;
